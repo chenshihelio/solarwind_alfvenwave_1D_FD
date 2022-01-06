@@ -1,0 +1,96 @@
+#include <math.h>
+#include <stdlib.h>
+#include "initialize.h"
+#include "parameter.h"
+#include "macros.h"
+
+real* calcEigens(real *arr, real Br)
+{
+	// Note arr is the conserved fields
+	real rho, u, pi, pe, energyIon, energyElectron;
+	real csound, calfven;
+	real cmin, cmax;
+
+	real *eigens;
+	eigens = (real*)malloc(sizeof(real) * NEigen);
+
+	rho = arr[0];
+	u = arr[1];
+	calfven = Br / sqrt(MU0 * rho);
+
+	pi = arr[2];
+	pe = arr[3];
+
+	csound = sqrt(adiabaticIdx * (pi + pe) / rho);
+
+	cmin = MIN(fabs(calfven), fabs(csound));
+	cmax = MAX(fabs(calfven), fabs(csound));
+
+	eigens[0] = u - cmax;
+	eigens[1] = u - cmin;
+	eigens[2] = u;
+	eigens[3] = u + cmin;
+	eigens[4] = u + cmax;
+
+	return eigens;
+}
+
+void setFirstPoint(real *uu, int nx, int nvar)
+{
+	uu[IDX(0, 0, nvar)] = rho0;
+	uu[IDX(0, 2, nvar)] = pi0;
+	uu[IDX(0, 3, nvar)] = pe0;
+	uu[IDX(0, 4, nvar)] = 0.25 * rho0 * BC_ZOUT * BC_ZOUT;
+}
+
+
+real updateParameter(real Y0, real Y1, real timeSim, real timeScale)
+{
+	real Y;
+	if (timeSim >= timeScale)
+	{
+		Y = Y1;
+	}
+	else
+	{
+		Y = Y0 + (Y1 - Y0) * timeSim / timeScale;
+	}
+
+	return Y;
+}
+
+void updateBC(real timeSim, real timeScale)
+{
+	BC_ZOUT = updateParameter(0, 60e3, timeSim, timeScale);
+	// adiabaticIdx = updateParameter(1.5, 1.66667, timeSim, timeScale);
+	// adiabaticIdx_E = updateParameter(1.5, 1.66667, timeSim, timeScale);
+
+	// MS = updateParameter(1.5E30,1.9884E30, timeSim, timeScale);  // 1.9884E30 kg
+
+	/* BC_N = updateParameter(1e15,5e14, timeSim, timeScale);
+	// Need to update the following quantities
+	rho0 = BC_N * (MP+ME);
+	pi0 = BC_N * KB * BC_TI;
+	pe0 = BC_N * KB * BC_TE; */
+
+	// // Update Br, remember to re-calcualte the array of Br
+	// BC_BR = updateParameter(1e-4, 3e-5, timeSim, timeScale);
+	// for (size_t i = 0; i < nx; i++)
+	// {
+	// 	Br[i] = (A[0] / A[i]) * BC_BR;
+	// }
+
+	/* // Update lambda, remember to calculate the whole array
+	LAMBDA0 = updateParameter(3E7, 6E7, timeSim, timeScale);
+	for (size_t i = 0; i < nx; i++)
+	{
+		wavelength[i] = LAMBDA0 * sqrt(A[i] / A[0]);
+	} */
+
+        /* // Update Q_AH
+	F_AH = updateParameter(5e-7,1e-7,timeSim,timeScale);
+	for(int i=0;i<nx;i++)
+	{
+		Q_AH[i] = F_AH * (A[0]/A[i]) * exp(-(xgrid[i]/RS-1)/scaleHeight_AH);
+	} */
+}

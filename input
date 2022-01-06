@@ -1,0 +1,22 @@
+1                  ; 0: not restart, 1: restart
+0                  ; restart file index, if restart
+1                  ; if restart, whether reset simulation time
+0                  ; boundary condition. 0: periodic, 1: free
+0.8                ; cfl
+4e6                ; Tmax
+2e5                ; dtOut
+1.66667            ; adiabatic_index Ion 1.666666667
+1.66667            ; adiabatic_index Electron 1.666666667
+5e14               ; boundary density m^{-3}
+5E5                ; boundary ion temperature K
+5E5                ; boundary electron temperature K
+5e-4               ; Tesla  Br
+0                  ; m/s boundary alfven wave amplitude   30E3
+6E7                ; meter perpendicular wavelength lambda0
+1.0                ; portion of wave energy into ions Cw
+0.1                ; coefficinet for wave reflection
+1                  ; if update BC. 1: Yes
+2E6                ; timescale for updating BC
+0                  ; if add viscous term to momentum equation
+1e9                ; viscosity m^2/s
+1e-7               ; ad-hoc heating J/m^3/s
