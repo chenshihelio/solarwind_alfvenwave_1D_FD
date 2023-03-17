@@ -153,7 +153,9 @@ int main(int argc, char **argv)
 			}
 
 			calcRHS(dudt,uu,dudx,d2udx2,xgrid,Br,wavelength,
-				A,dlnAdr,Q_AH,CW,CRflect,nx,nvar);
+				A,dlnAdr,Q_AH,CW,CRflect,C_AH_electron,
+                CQeColless,C_ratio_ion_colless,ifInhomoGammaI,gammaI_inhomo,
+                nx,nvar);
 
             rkExecute(iRK, cc1, dd1, uu, dudt, dudtRK, arrSize);
 
@@ -164,6 +166,7 @@ int main(int argc, char **argv)
 			free(dudx);
 			free(d2udx2);
         }
+	// filter(uu, nx, nvar);
 
         timeSim+= dt;
         iStep++;

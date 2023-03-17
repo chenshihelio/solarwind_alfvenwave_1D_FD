@@ -8,7 +8,8 @@ extern real x0, x1, *xgrid, *dx;
 extern int nx,arrSize;
 
 extern int nvar,typeBC,
-	ifRestart, restartIdx, ifResetTime, ifUpdateBC, ifViscosity;
+	ifRestart, restartIdx, ifResetTime, ifUpdateBC, 
+	ifViscosity, ifInhomoGammaI;
 extern real *uu, *dudt, *dudtRK;
 
 extern real *FD_Coeff_CenterL_1st, *FD_Coeff_CenterR_1st,
@@ -17,9 +18,10 @@ extern real *FD_Coeff_CenterL_1st, *FD_Coeff_CenterR_1st,
 	*FD_Coeff_Left_2nd, *FD_Coeff_Right_2nd;
 
 
-extern real *fExp,*A,*dlnAdr,*Br,*wavelength,*Q_AH;
+extern real *fExp,*A,*dlnAdr,*Br,*wavelength,*Q_AH,*gammaI_inhomo;
 extern real adiabaticIdx, adiabaticIdx_E, F_AH;
-extern real BC_N, BC_TI, BC_TE, BC_ZOUT, BC_BR, CW, LAMBDA0, CRflect;
+extern real BC_N, BC_TI, BC_TE, BC_ZOUT, BC_BR, CW, LAMBDA0, 
+	CRflect, CQeColless, C_AH_electron, C_ratio_ion_colless;
 
 extern real rho0,pi0,pe0,MS;
 

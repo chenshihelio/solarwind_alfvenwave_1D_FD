@@ -5,12 +5,14 @@
 
 void calcRHS(real *dudt, real *uu, real *dudx, real *d2udx2, 
 	real *xgrid, real *Br, real *lambda, real *A, real *dlnA, 
-	real *Q_AH, real Cwave, real Creflect, int nx, int nvar)
+	real *Q_AH, real Cwave, real Creflect, real C_AH_electron,
+	real CQeCollissionless, real Cion_colless, int ifInhoGamI, real *gamma_i_arr,
+	int nx, int nvar)
 {
 	real rho, ux, pi, pe, eo, ei, n, VA, r, lamb,
 		divu, divVA,drho,dux,dpi,dpe,deo,dei,dlnAdr;
 	real Qo, Qi, Ro, Ri, dissRateIon, dissRateElectron,
-		Q_AH_i, Q_AH_e;
+		Q_AH_i, Q_AH_e, gamma_i, Q_colless_e;
 
 	for (int i = 0; i < nx; i++)
 	{
@@ -58,14 +60,27 @@ void calcRHS(real *dudt, real *uu, real *dudx, real *d2udx2,
 
 
 		Q_AH_i = Q_AH[i];
-		Q_AH_e = Q_AH[i];
+		Q_AH_e = Q_AH[i] * C_AH_electron;
+
+
+		Q_colless_e = - CQeCollissionless *(ux * dpe + divu * pe);
+
+
+		if (ifInhoGamI==1)
+		{
+			gamma_i = gamma_i_arr[i];
+		}
+		else
+		{
+			gamma_i = adiabaticIdx;
+		}
 
 		dudt[IDX(i, 0, nvar)] = -(ux*drho + rho * divu);
 		dudt[IDX(i, 1, nvar)] = -ux * dux - (dpi + dpe + 0.5*(deo+dei)) / rho - G * MS / r / r;
-		dudt[IDX(i, 2, nvar)] = -ux * dpi - adiabaticIdx * divu * pi + 
-			(adiabaticIdx - 1) * (dissRateIon + Q_AH_i);
+		dudt[IDX(i, 2, nvar)] = -ux * dpi - gamma_i * divu * pi + 
+			(gamma_i - 1) * (dissRateIon + Q_AH_i) + Cion_colless * Q_colless_e;
 		dudt[IDX(i, 3, nvar)] = -ux * dpe - adiabaticIdx_E * divu * pe + 
-			(adiabaticIdx_E - 1) * (dissRateElectron + Q_AH_e);
+			(adiabaticIdx_E - 1) * (dissRateElectron + Q_AH_e) + (1-Cion_colless) * Q_colless_e;
 		dudt[IDX(i, 4, nvar)] =  -(divu + divVA)*eo - (ux + VA)*deo - 0.5*divu*eo + Qo + Ro;
 		dudt[IDX(i, 5, nvar)] =  -(divu - divVA)*ei - (ux - VA)*dei - 0.5*divu*ei + Qi + Ri;
 

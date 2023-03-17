@@ -61,17 +61,34 @@ real updateParameter(real Y0, real Y1, real timeSim, real timeScale)
 
 void updateBC(real timeSim, real timeScale)
 {
-	BC_ZOUT = updateParameter(0, 60e3, timeSim, timeScale);
-	// adiabaticIdx = updateParameter(1.5, 1.66667, timeSim, timeScale);
-	// adiabaticIdx_E = updateParameter(1.5, 1.66667, timeSim, timeScale);
+	// BC_ZOUT = updateParameter(0, 5e3, timeSim, timeScale);
+	
+	/* adiabaticIdx = updateParameter(1.0, 1.66667, timeSim, timeScale);
+	adiabaticIdx_E = updateParameter(1.0, 1.66667, timeSim, timeScale);
+	if(ifInhomoGammaI==1)
+	{
+		for (size_t i = 0; i < nx; i++)
+		{
+			real s = xgrid[i] / RS;
+			gammaI_inhomo[i] = 1.0 + (adiabaticIdx - 1.0) * 
+				(tanh((s-4)/0.5)+1)/2.0;
+		}
+	} */
+
+	/* BC_TI = updateParameter(1e6,2e6,timeSim,timeScale);
+	BC_TE = updateParameter(1e6,2e6,timeSim,timeScale);
+	pi0 = BC_N * KB * BC_TI;
+	pe0 = BC_N * KB * BC_TE; */
+
+	CW = updateParameter(1.0, 0.95, timeSim, timeScale); 
 
 	// MS = updateParameter(1.5E30,1.9884E30, timeSim, timeScale);  // 1.9884E30 kg
 
-	/* BC_N = updateParameter(1e15,5e14, timeSim, timeScale);
-	// Need to update the following quantities
-	rho0 = BC_N * (MP+ME);
-	pi0 = BC_N * KB * BC_TI;
-	pe0 = BC_N * KB * BC_TE; */
+	// BC_N = updateParameter(5e14,1e14, timeSim, timeScale);
+	// // Need to update the following quantities
+	// rho0 = BC_N * (MP+ME);
+	// pi0 = BC_N * KB * BC_TI;
+	// pe0 = BC_N * KB * BC_TE; 
 
 	// // Update Br, remember to re-calcualte the array of Br
 	// BC_BR = updateParameter(1e-4, 3e-5, timeSim, timeScale);
@@ -87,10 +104,19 @@ void updateBC(real timeSim, real timeScale)
 		wavelength[i] = LAMBDA0 * sqrt(A[i] / A[0]);
 	} */
 
-        /* // Update Q_AH
-	F_AH = updateParameter(5e-7,1e-7,timeSim,timeScale);
-	for(int i=0;i<nx;i++)
-	{
-		Q_AH[i] = F_AH * (A[0]/A[i]) * exp(-(xgrid[i]/RS-1)/scaleHeight_AH);
-	} */
+    // // Update Q_AH
+	// F_AH = updateParameter(2e-7,5e-7,timeSim,timeScale);
+	// for(int i=0;i<nx;i++)
+	// {
+	// 	Q_AH[i] = F_AH * (A[0]/A[i]) * exp(-(xgrid[i]/RS-1)/scaleHeight_AH);
+	// }
+
+	// C_AH_electron = updateParameter(1.0,0.4,timeSim,timeScale);
+
+
+	// update CQeColless
+	// CQeColless = updateParameter(0,1,timeSim, timeScale);
+
+	// // update C_ratio_ion_colless
+	// C_ratio_ion_colless = updateParameter(0.5,0,timeSim, timeScale);
 }

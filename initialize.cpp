@@ -15,7 +15,7 @@ real x0, x1, *xgrid, *dx;
 int nx, arrSize;
 
 int nvar=NVAR,typeBC=0,ifRestart = 0, restartIdx = 0, ifResetTime,
-	ifUpdateBC = 0, ifViscosity = 0;
+	ifUpdateBC = 0, ifViscosity = 0, ifInhomoGammaI = 0;
 
 real *uu, *dudt, *dudtRK;
 
@@ -24,9 +24,13 @@ real *FD_Coeff_CenterL_1st, *FD_Coeff_CenterR_1st,
 	*FD_Coeff_Left_1st, *FD_Coeff_Right_1st,
 	*FD_Coeff_Left_2nd, *FD_Coeff_Right_2nd;
 
-real BC_N, BC_TI, BC_TE, BC_BR, BC_ZOUT, CW, LAMBDA0,CRflect;
-real *A,*fExp,*dlnAdr,*Br,*wavelength;
-real *Q_AH, F_AH; // ad-hoc heating term
+real BC_N, BC_TI, BC_TE, BC_BR, BC_ZOUT, CW, LAMBDA0,CRflect,
+	CQeColless;
+real *A,*fExp,*dlnAdr,*Br,*wavelength,*gammaI_inhomo;
+
+// ad-hoc and collisionless heating terms
+real *Q_AH, F_AH, C_AH_electron, C_ratio_ion_colless = 0; 
+
 real rho0,pi0,pe0,MS;
 
 real cfl=0.5,Tmax=1.0,dtOut = 0.1, timeScaleUpdateBC = 1E4,
@@ -77,7 +81,11 @@ void initialize()
     printf("    LAMBDA0 (perpendicular wavelength) = %10.4e m\n",LAMBDA0);
     printf("Other parameters:\n");
     printf("    CW (how much energy dissipation goes to ion) = %10.4f\n",CW);
+    printf("    CQeColless (coefficient for collisionless electron heat conduction) = %10.4f\n",CQeColless);
+	printf("    C_ratio_ion_Colless (how much collisionless electron heating goes to ions) = %10.4f\n",
+		C_ratio_ion_colless);
 	printf("    F_AH (ad-hoc heating strength) = %10.4e J/m^3/s\n", F_AH);
+	printf("    C_AH_electron (ratio of ad-hoc heating to electron) = %10.4f\n", F_AH);
 	printf("---------------------------\n");
 	printf("    If update the boundary conditions with time?: %1d\n", ifUpdateBC);
 	printf("    timescale for boundary condition update = %10.4e s\n", timeScaleUpdateBC);
@@ -95,7 +103,7 @@ void initialize()
 	omp_set_num_threads(NPROC);
 	
     // initialize grid()
-	x0 = 1.1;
+	x0 = 1.0;
 	x1 = 215;
 	real h0 = 1e-3;
 	real h1 = 0.1;
@@ -168,6 +176,18 @@ void initialize()
 	{
 		s = xgrid[i] / RS;
 		Q_AH[i] = F_AH * (A[0] / A[i]) * exp(-(s-1)/scaleHeight_AH);
+	}
+
+
+	// calculate gamma_i if inhomogeneous
+	gammaI_inhomo = initArrays(nx,1);
+	if(ifInhomoGammaI==1)
+	{
+		for (size_t i = 0; i < nx; i++)
+		{
+			s = xgrid[i] / RS;
+			gammaI_inhomo[i] = 1.0 + (adiabaticIdx - 1.0) * (tanh((s-4)/0.5)+1)/2.0;
+		}
 	}
 
     // calculate some useful quantities
@@ -434,6 +454,12 @@ void readInput(const char *fileName)
 	CRflect = atof(valueRead);
 
 	valueRead = readLine(fpRead);
+	CQeColless = atof(valueRead);
+
+	valueRead = readLine(fpRead);
+	C_ratio_ion_colless = atof(valueRead);
+
+	valueRead = readLine(fpRead);
 	ifUpdateBC = (int)atof(valueRead);
 
 	valueRead = readLine(fpRead);
@@ -447,6 +473,12 @@ void readInput(const char *fileName)
 
 	valueRead = readLine(fpRead);
 	F_AH = atof(valueRead);
+
+	valueRead = readLine(fpRead);
+	C_AH_electron = atof(valueRead);
+
+	valueRead = readLine(fpRead);
+	ifInhomoGammaI = (int)atof(valueRead);
 
     int closeStatus = fclose(fpRead);
 }

@@ -7,16 +7,20 @@
 2e5                ; dtOut
 1.66667            ; adiabatic_index Ion 1.666666667
 1.66667            ; adiabatic_index Electron 1.666666667
-5e14               ; boundary density m^{-3}
-5E5                ; boundary ion temperature K
-5E5                ; boundary electron temperature K
+1e14               ; boundary density m^{-3}
+1E6                ; boundary ion temperature K
+1E6                ; boundary electron temperature K
 5e-4               ; Tesla  Br
-0                  ; m/s boundary alfven wave amplitude   30E3
+10e3               ; m/s boundary alfven wave amplitude   30E3
 6E7                ; meter perpendicular wavelength lambda0
 1.0                ; portion of wave energy into ions Cw
 0.1                ; coefficinet for wave reflection
+1.0                ; coefficient for collisionless electron heating
+0.0                ; ratio of colliesionless electron heating into ions
 1                  ; if update BC. 1: Yes
-2E6                ; timescale for updating BC
+1E6                ; timescale for updating BC
 0                  ; if add viscous term to momentum equation
 1e9                ; viscosity m^2/s
-1e-7               ; ad-hoc heating J/m^3/s
+5e-7               ; ad-hoc heating J/m^3/s
+0.4                ; C_AH_electron: ratio of ad-hoc heating for electron
+0                  ; whether use a inhomogeneous gamma_i
